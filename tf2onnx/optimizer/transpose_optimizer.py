@@ -171,6 +171,7 @@ class TransposeOptimizer(GraphOptimizerBase):
     def _initialize_handlers(self):
         self._handler_map = {
             "Add": self._add_handler,
+            "Neg": self._simple_through_handler,            
             "Cast": self._simple_through_handler,
             "Clip": self._simple_through_handler,
             "Concat": self._concat_handler,
@@ -456,7 +457,10 @@ class TransposeOptimizer(GraphOptimizerBase):
 
         # if the shape is () or (1), we just move transpose after the mul
         if not multiplier.shape or (len(multiplier.shape) == 1 and multiplier.shape[0] == 1):
-            return self._switch_transpose_and_node(node, trans)
+            pass
+        else:
+            multiplier_input_node.set_tensor_value(np.transpose(multiplier, (2, 0, 1)))
+        return self._switch_transpose_and_node(node, trans)
 
         return False
 
